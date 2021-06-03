@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -35,52 +36,53 @@ public class BidListController {
         if (!result.hasErrors()) {
             try {
                 bidListService.createBidList(bid);
-                model.addAttribute("message", "Add operation successful");
+                model.addAttribute("bidList", new BidList());
+                model.addAttribute("message", "Add successful");
             } catch (Exception e) {
-                model.addAttribute("message", "The add operation had an issue, please retry later");
+                model.addAttribute("message", "Issue during creating, please retry later");
             }
         }
         return "bidList/add";
     }
 
     @GetMapping("/bidList/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
 
         try {
             BidList bidList = bidListService.getBidListById(id);
             model.addAttribute("bidList", bidList);
             return "bidList/update";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("message", e.getMessage());
-            return home(model);
+            attributes.addFlashAttribute("message", e.getMessage());
+            return "redirect:/bidList/list";
         }
     }
 
     @PostMapping("/bidList/update/{id}")
     public String updateBid(@PathVariable("id") Integer id, @ModelAttribute("bidList") @Valid BidList bidList,
-                             BindingResult result, Model model) {
+                             BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
-            return showUpdateForm(id, model);
+            return showUpdateForm(id, model, attributes);
         }
         try {
-            bidListService.updateBidList(bidList);
-            model.addAttribute("message", "Update operation successful");
+            bidListService.updateBidList(bidList, id);
+            attributes.addFlashAttribute("message", "Update successful");
         } catch (Exception e) {
-            model.addAttribute("message", "The update operation had an issue, please retry later");
+            attributes.addFlashAttribute("message", "Issue during updating, please retry later");
         }
-        return home(model);
+        return "redirect:/bidList/list";
     }
 
     @GetMapping("/bidList/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, Model model) {
+    public String deleteBid(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
         try {
             bidListService.deleteBidList(id);
-            model.addAttribute("message", "Delete operation successful");
+            attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
-            model.addAttribute("message", e.getMessage());
+            attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            model.addAttribute("message", "The delete operation had an issue, please retry later");
+            attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
         }
-        return home(model);
+        return "redirect:/bidList/list";
     }
 }

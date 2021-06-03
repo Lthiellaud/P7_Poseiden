@@ -28,11 +28,16 @@ public class BidListServiceImpl implements BidListService {
     /**
      * Updates a bid list.
      * @param bidList the bid list to be updated
+     * @param id id of the bidlist to be updated
      */
     @Override
-    public void updateBidList(BidList bidList) {
-        bidList.setRevisionDate(new Timestamp(System.currentTimeMillis()));
-        bidListRepository.save(bidList);
+    public void updateBidList(BidList bidList, Integer id) {
+        BidList updatedBidList = getBidListById(id);
+        updatedBidList.setAccount(bidList.getAccount());
+        updatedBidList.setBidQuantity(bidList.getBidQuantity());
+        updatedBidList.setType(bidList.getType());
+        updatedBidList.setRevisionDate(new Timestamp(System.currentTimeMillis()));
+        bidListRepository.save(updatedBidList);
     }
 
     /**

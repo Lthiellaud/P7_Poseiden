@@ -26,9 +26,11 @@
 	<div class="row"><h2>Bid List</h2></div>
 	<div class="row">
 		<a href="/bidList/add" class="btn btn-primary btn-sm">Add New</a>
-		<div>
-			<h4 th:if="${message != null}" th:utext="${message}" style="color: red;">Result message</h4>
-		</div>
+	</div>
+	<div class="row">
+		<p th:if="${message != null}" th:utext="${message}" style="color: red;">Result message</p>
+	</div>
+	<div class="row">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
@@ -40,7 +42,19 @@
 				</tr>
 			</thead>
 			<tbody>
-				<!-- TODO: Show all Bids to the table, the Action column will have Edit & Delete buttons -->
+			<tr th:if="${#lists.isEmpty(bidLists)}">
+				<td colspan="3">No bank movement registered</td>
+			</tr>
+			<tr th:each="bidList: ${bidLists}">
+				<td><span th:text="${bidList.bidListId}"> bankAccount </span></td>
+				<td><span th:text="${bidList.account}"> Description </span></td>
+				<td><span th:text="${bidList.type}"> Amount </span></td>
+				<td><span th:text="${bidList.bidQuantity}"> Bid quantity </span></td>
+				<td>
+					<a th:href="@{/bidList/update/{id}(id=${bidList.bidListId})}">Edit</a>&nbsp;|&nbsp;
+					<a th:href="@{/bidList/delete/{id}(id=${bidList.bidListId})}">Delete</a>
+				</td>
+			</tr>
 			</tbody>
 		</table>
 	</div>
