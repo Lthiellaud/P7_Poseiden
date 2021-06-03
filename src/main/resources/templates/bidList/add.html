@@ -12,6 +12,9 @@
 	<div class="row">
 		<h2>Add New Bid</h2>
 	</div>
+	<div>
+		<h4 th:if="${message != null}" th:utext="${message}" style="color: red;">Result message</h4>
+	</div>
 
 	<div class="row">
 		<form action="#" th:action="@{/bidList/validate}" th:object="${bidList}" method="post" class="form-horizontal" style="width: 100%">
