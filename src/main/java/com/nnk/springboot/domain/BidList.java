@@ -1,5 +1,7 @@
 package com.nnk.springboot.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Required;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "bidlist")
+@Getter
+@Setter
 public class BidList {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

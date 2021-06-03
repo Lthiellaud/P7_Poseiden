@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface BidListService {
 
-    void createBidList();
-    void updateBidList(Integer id);
+    void createBidList(BidList bid);
+    void updateBidList(BidList id);
     List<BidList> getAllBidList();
     BidList getBidListById(Integer id);
-    void deleteBidList();
+    void deleteBidList(Integer id);
 }

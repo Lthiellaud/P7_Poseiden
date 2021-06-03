@@ -13,15 +13,10 @@ import javax.validation.Valid;
 
 @Controller
 public class BidListController {
-    // TODO: Inject Bid service
 
     @Autowired
     private BidListService bidListService;
 
-    @ModelAttribute("bidList")
-    public BidList getBidListObject(){
-        return new BidList();
-    }
     @RequestMapping("/bidList/list")
     public String home(Model model)
     {
@@ -30,7 +25,8 @@ public class BidListController {
     }
 
     @GetMapping("/bidList/add")
-    public String addBidForm() {
+    public String addBidForm(Model model) {
+        model.addAttribute("bidList", new BidList());
         return "bidList/add";
     }
 
@@ -38,7 +34,7 @@ public class BidListController {
     public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Model model) {
         if (!result.hasErrors()) {
             try {
-                bidListService.createBidList();
+                bidListService.createBidList(bid);
                 model.addAttribute("message", "Add operation successful");
             } catch (Exception e) {
                 model.addAttribute("message", "The add operation had an issue, please retry later");
@@ -49,8 +45,15 @@ public class BidListController {
 
     @GetMapping("/bidList/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("bidList", bidListService.getBidListById(id));
-        return "bidList/update";
+
+        try {
+            BidList bidList = bidListService.getBidListById(id);
+            model.addAttribute("bidList", bidList);
+            return "bidList/update";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("message", e.getMessage());
+            return home(model);
+        }
     }
 
     @PostMapping("/bidList/update/{id}")
@@ -60,7 +63,7 @@ public class BidListController {
             return showUpdateForm(id, model);
         }
         try {
-            bidListService.updateBidList(id);
+            bidListService.updateBidList(bidList);
             model.addAttribute("message", "Update operation successful");
         } catch (Exception e) {
             model.addAttribute("message", "The update operation had an issue, please retry later");
@@ -71,8 +74,10 @@ public class BidListController {
     @GetMapping("/bidList/delete/{id}")
     public String deleteBid(@PathVariable("id") Integer id, Model model) {
         try {
-            bidListService.updateBidList(id);
+            bidListService.deleteBidList(id);
             model.addAttribute("message", "Delete operation successful");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("message", e.getMessage());
         } catch (Exception e) {
             model.addAttribute("message", "The delete operation had an issue, please retry later");
         }
