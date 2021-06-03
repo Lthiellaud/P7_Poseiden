@@ -2,6 +2,8 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.services.BidListService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ public class BidListController {
 
     @Autowired
     private BidListService bidListService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BidListController.class);
 
     @RequestMapping("/bidList/list")
     public String home(Model model)
@@ -36,9 +40,11 @@ public class BidListController {
         if (!result.hasErrors()) {
             try {
                 bidListService.createBidList(bid);
+                LOGGER.info("BidList added");
                 model.addAttribute("bidList", new BidList());
                 model.addAttribute("message", "Add successful");
             } catch (Exception e) {
+                LOGGER.error("Error during adding BindList " + e.toString());
                 model.addAttribute("message", "Issue during creating, please retry later");
             }
         }
@@ -53,6 +59,7 @@ public class BidListController {
             model.addAttribute("bidList", bidList);
             return "bidList/update";
         } catch (IllegalArgumentException e) {
+            LOGGER.error("Error during getting BindList " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
             return "redirect:/bidList/list";
         }
@@ -66,8 +73,13 @@ public class BidListController {
         }
         try {
             bidListService.updateBidList(bidList, id);
+            LOGGER.info("BidList id " + id + " updated");
             attributes.addFlashAttribute("message", "Update successful");
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Error during getting BindList " + e.toString());
+            attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
+            LOGGER.error("Error during updating BindList " + e.toString());
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
         }
         return "redirect:/bidList/list";
@@ -77,10 +89,13 @@ public class BidListController {
     public String deleteBid(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
         try {
             bidListService.deleteBidList(id);
+            LOGGER.info("BidList id " + id + " deleted");
             attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
+            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
+            LOGGER.error("Error during deleting BindList " + id + " "  + e.toString());
             attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
         }
         return "redirect:/bidList/list";
