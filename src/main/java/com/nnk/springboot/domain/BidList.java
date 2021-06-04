@@ -1,5 +1,7 @@
 package com.nnk.springboot.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Required;
 
 import javax.persistence.*;
@@ -10,10 +12,12 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "bidlist")
+@Getter
+@Setter
 public class BidList {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer BidListId ;
+    private Integer bidListId;
     @NotBlank(message = "Account is mandatory")
     private String account ;
     @NotBlank(message = "Type is mandatory")
