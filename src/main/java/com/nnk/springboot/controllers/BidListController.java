@@ -86,7 +86,7 @@ public class BidListController {
     }
 
     @GetMapping("/bidList/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
+    public String deleteBid(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {
             bidListService.deleteBidList(id);
             LOGGER.info("BidList id " + id + " deleted");

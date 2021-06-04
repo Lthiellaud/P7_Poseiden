@@ -21,7 +21,7 @@ public class BidListServiceImpl implements BidListService {
      */
     @Override
     public void createBidList(BidList bidList) {
-        bidList.setBidListDate(new Timestamp(System.currentTimeMillis()));
+        bidList.setCreationDate(new Timestamp(System.currentTimeMillis()));
         bidListRepository.save(bidList);
     }
 

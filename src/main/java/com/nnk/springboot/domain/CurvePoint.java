@@ -1,15 +1,17 @@
 package com.nnk.springboot.domain;
 
-import org.hibernate.validator.constraints.Length;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 
 @Entity
 @Table(name = "curvepoint")
+@Getter
+@Setter
 public class CurvePoint {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

@@ -12,6 +12,10 @@
 	<div class="row">
 		<h2>Add New Trade</h2>
 	</div>
+	<div class="row">
+		<p th:if="${message != null}" th:utext="${message}" style="color: red;">Result message</p>
+	</div>
+
 
 	<div class="row">
 		<form action="#" th:action="@{/trade/validate}" th:object="${trade}" method="post" class="form-horizontal" style="width: 100%">

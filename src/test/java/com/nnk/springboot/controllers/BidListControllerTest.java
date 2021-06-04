@@ -135,7 +135,8 @@ class BidListControllerTest {
                     .param("bidQuantity", "10"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/bidList/validate"))
-                .andExpect(model().hasNoErrors());
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Add successful"));
     }
 
     @WithMockUser
