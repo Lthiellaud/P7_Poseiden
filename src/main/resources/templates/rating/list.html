@@ -26,6 +26,11 @@
 	<div class="row"><h2>Rating List</h2></div>
 	<div class="row">
 		<a href="/rating/add" class="btn btn-primary btn-sm">Add New</a>
+	</div>
+	<div class="row">
+		<p th:if="${message != null}" th:text="${message}" style="color: red;">Result message</p>
+	</div>
+	<div class="row">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
@@ -38,7 +43,17 @@
 				</tr>
 			</thead>
 			<tbody>
-			<!-- TODO: Show all Rating to the table, the Action column will have Edit & Delete buttons -->
+				<tr th:each="rating :${ratings}">
+					<td><span th:text="${rating.id}"> Id </span></td>
+					<td><span th:text="${rating.moodysRating}"> MoodysRating </span></td>
+					<td><span th:text="${rating.sandPRating}"> SandPRating </span></td>
+					<td><span th:text="${rating.fitchRating}"> FitchRating </span></td>
+					<td><span th:text="${rating.orderNumber}"> Order </span></td>
+					<td>
+						<a th:href="@{/ratingPoint/update/{id}(id=${rating.id})}">Edit</a>&nbsp;|&nbsp;
+						<a th:href="@{/ratingPoint/delete/{id}(id=${rating.id})}">Delete</a>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>

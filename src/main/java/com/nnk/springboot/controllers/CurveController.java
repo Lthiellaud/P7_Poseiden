@@ -38,7 +38,7 @@ public class CurveController {
     public String validate(@ModelAttribute @Valid CurvePoint curvePoint, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
-            return "/curvePoint/add";
+            return "curvePoint/add";
         }
         try {
             curvePointService.createCurvePoint(curvePoint);
@@ -68,7 +68,7 @@ public class CurveController {
     public String updateCurve(@PathVariable("id") Integer id, @ModelAttribute @Valid CurvePoint curvePoint,
                               BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
-            return showUpdateForm(id, model, attributes);
+            return "curvePoint/update";
         }
         try {
             curvePointService.updateCurvePoint(curvePoint, id);

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -119,73 +120,74 @@ class CurveControllerTest {
     }
 
     @Test
-    @Disabled
     public void postCurvePointValidateWithoutAuthentication() throws Exception {
-        mockMvc.perform(post("/curvePoint/validate"))
+        mockMvc.perform(post("/curvePoint/validate")
+                .with(csrf()))
                 .andExpect(status().is(401));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postCurvePointValidate() throws Exception {
         mockMvc.perform(post("/curvePoint/validate")
                     .param("curveId", "10")
                     .param("term", "10")
-                    .param("value", "10"))
+                    .param("value", "10")
+                    .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/curvePoint/validate"))
+                .andExpect(view().name("curvePoint/add"))
                 .andExpect(model().hasNoErrors())
                 .andExpect(model().attribute("message", "Add successful"));
     }
 
     @WithMockUser
     @Test
-    @Disabled
-    public void postCurvePointValidateCurveIdEmpty() throws Exception {
+    public void postCurvePointValidateCurveIdNull() throws Exception {
         mockMvc.perform(post("/curvePoint/validate")
-                .param("curveId", " ")
-                .param("term", "10")
-                .param("value", "10"))
+                    .param("curveId", " ")
+                    .param("term", "10")
+                    .param("value", "10")
+                    .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/curvePoint/validate"))
+                .andExpect(view().name("curvePoint/add"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("curvePoint", "curveId", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("curvePoint", "curveId", "NotNull"));
     }
 
     @Test
-    @Disabled
     public void postCurvePointUpdateWithoutAuthentication() throws Exception {
-        mockMvc.perform(post("/curvePoint/update/0"))
+        mockMvc.perform(post("/curvePoint/update/0")
+                .with(csrf()))
                 .andExpect(status().is(401));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postCurvePointUpdate() throws Exception {
         mockMvc.perform(post("/curvePoint/update/0")
-                .param("id", "0")
-                .param("curveId", "10")
-                .param("term", "10")
-                .param("value", "10"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/curvePoint/update/0"))
-                .andExpect(model().hasNoErrors());
+                    .param("id", "0")
+                    .param("curveId", "10")
+                    .param("term", "10")
+                    .param("value", "10")
+                    .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/curvePoint/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Update successful"));
     }
 
     @WithMockUser
     @Test
-    @Disabled
-    public void postCurvePointUpdateCurveIdEmpty() throws Exception {
+    public void postCurvePointUpdateCurveIdNull() throws Exception {
         mockMvc.perform(post("/curvePoint/update/0")
-                .param("curveId", " ")
-                .param("term", "10")
-                .param("value", "10"))
+                    .param("curveId", "")
+                    .param("term", "10")
+                    .param("value", "10")
+                    .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/curvePoint/update/0"))
+                .andExpect(view().name("curvePoint/update"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("curvePoint", "curveId", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("curvePoint", "curveId", "NotNull"));
     }
 
 }

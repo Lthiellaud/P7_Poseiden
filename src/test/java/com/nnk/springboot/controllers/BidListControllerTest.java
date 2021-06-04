@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -119,98 +120,113 @@ class BidListControllerTest {
     }
 
     @Test
-    @Disabled
     public void postBidListValidateWithoutAuthentication() throws Exception {
-        mockMvc.perform(post("/bidList/validate"))
+        mockMvc.perform(post("/bidList/validate")
+                .with(csrf()))
                 .andExpect(status().is(401));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListValidate() throws Exception {
         mockMvc.perform(post("/bidList/validate")
                     .param("account", "test")
                     .param("type", "type")
-                    .param("bidQuantity", "10"))
+                    .param("bidQuantity", "10")
+                    .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/validate"))
+                .andExpect(view().name("bidList/add"))
                 .andExpect(model().hasNoErrors())
                 .andExpect(model().attribute("message", "Add successful"));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListValidateAccountEmpty() throws Exception {
         mockMvc.perform(post("/bidList/validate")
                 .param("account", " ")
                 .param("type", "type")
-                .param("bidQuantity", "10"))
+                .param("bidQuantity", "10")
+                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/validate"))
+                .andExpect(view().name("bidList/add"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "account", "NotBlank"));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListValidateTypeEmpty() throws Exception {
         mockMvc.perform(post("/bidList/validate")
                 .param("account", "account")
                 .param("type", "")
-                .param("bidQuantity", "10"))
+                .param("bidQuantity", "10")
+                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/validate"))
+                .andExpect(view().name("bidList/add"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "type", "NotBlank"));
     }
 
     @Test
-    @Disabled
     public void postBidListUpdateWithoutAuthentication() throws Exception {
-        mockMvc.perform(post("/bidList/update/0"))
+        mockMvc.perform(post("/bidList/update/0")
+                .with(csrf()))
                 .andExpect(status().is(401));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListUpdate() throws Exception {
+
         mockMvc.perform(post("/bidList/update/0")
                 .param("account", "test")
                 .param("type", "type")
-                .param("bidQuantity", "10"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/update/0"))
+                .param("bidQuantity", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/bidList/list"))
                 .andExpect(model().hasNoErrors());
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListUpdateAccountEmpty() throws Exception {
-        mockMvc.perform(post("/bidList/update/0")
-                .param("account", " ")
+        BidList bidList = new BidList();
+        bidList.setBidListId(1);
+        bidList.setAccount("test");
+        bidList.setType("Type1");
+        bidList.setBidQuantity(10.0);
+        when(bidListService.getBidListById(1)).thenReturn(bidList);
+
+        mockMvc.perform(post("/bidList/update/1")
+                .param("account", "")
                 .param("type", "type")
-                .param("bidQuantity", "10"))
+                .param("bidQuantity", "10")
+                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/update/0"))
+                .andExpect(view().name("bidList/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "account", "NotBlank"));
     }
 
     @WithMockUser
     @Test
-    @Disabled
     public void postBidListUpdateTypeEmpty() throws Exception {
-        mockMvc.perform(post("/bidList/update/0")
+        BidList bidList = new BidList();
+        bidList.setBidListId(1);
+        bidList.setAccount("test");
+        bidList.setType("Type1");
+        bidList.setBidQuantity(10.0);
+        when(bidListService.getBidListById(1)).thenReturn(bidList);
+
+        mockMvc.perform(post("/bidList/update/1")
                 .param("account", "account")
                 .param("type", "")
-                .param("bidQuantity", "10"))
+                .param("bidQuantity", "10")
+                .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/bidList/update/0"))
+                .andExpect(view().name("bidList/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "type", "NotBlank"));
     }

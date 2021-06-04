@@ -26,8 +26,8 @@ public class CurvePointServiceImpl implements CurvePointService {
     }
 
     /**
-     * Updates a bid list.
-     * @param curvePoint the bid list to be updated
+     * Updates a curve point.
+     * @param curvePoint the curve point to be updated
      * @param id id of the curvePoint to be updated
      */
     @Override
@@ -40,8 +40,8 @@ public class CurvePointServiceImpl implements CurvePointService {
     }
 
     /**
-     * Gives all the bid lists
-     * @return all the bid lists
+     * Gives all the curve points
+     * @return all the curve points
      */
     @Override
     public List<CurvePoint> getAllCurvePoint() {
@@ -49,9 +49,9 @@ public class CurvePointServiceImpl implements CurvePointService {
     }
 
     /**
-     * returns a bid list from an id
+     * returns a curve point from an id
      * @param id the id
-     * @return the bid list
+     * @return the curve point
      */
     @Override
     public CurvePoint getCurvePointById(Integer id) throws IllegalArgumentException {
@@ -60,7 +60,7 @@ public class CurvePointServiceImpl implements CurvePointService {
     }
 
     /**
-     * delete a bid list from an id
+     * delete a curve point from an id
      * @param id the id
      */
     @Override
