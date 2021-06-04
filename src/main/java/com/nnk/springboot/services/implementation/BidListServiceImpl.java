@@ -55,9 +55,9 @@ public class BidListServiceImpl implements BidListService {
      * @return the bid list
      */
     @Override
-    public BidList getBidListById(Integer id) {
+    public BidList getBidListById(Integer id) throws IllegalArgumentException {
         return bidListRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid bid list Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid bid list Id: " + id));
     }
 
     /**
