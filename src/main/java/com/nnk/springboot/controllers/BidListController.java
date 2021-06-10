@@ -23,8 +23,7 @@ public class BidListController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BidListController.class);
 
     @RequestMapping("/bidList/list")
-    public String home(Model model)
-    {
+    public String home(Model model) {
         model.addAttribute("bidLists", bidListService.getAllBidList());
         return "bidList/list";
     }

@@ -22,8 +22,7 @@ public class CurveController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurveController.class);
 
     @RequestMapping("/curvePoint/list")
-    public String home(Model model)
-    {
+    public String home(Model model) {
         model.addAttribute("curvePoints", curvePointService.getAllCurvePoint());
         return "curvePoint/list";
     }

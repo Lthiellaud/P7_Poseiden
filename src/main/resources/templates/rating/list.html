@@ -29,6 +29,7 @@
 	</div>
 	<div class="row">
 		<p th:if="${message != null}" th:text="${message}" style="color: red;">Result message</p>
+		<p th:unless="${message != null}">&nbsp;</p>
 	</div>
 	<div class="row">
 		<table class="table table-bordered">
@@ -50,8 +51,8 @@
 					<td><span th:text="${rating.fitchRating}"> FitchRating </span></td>
 					<td><span th:text="${rating.orderNumber}"> Order </span></td>
 					<td>
-						<a th:href="@{/ratingPoint/update/{id}(id=${rating.id})}">Edit</a>&nbsp;|&nbsp;
-						<a th:href="@{/ratingPoint/delete/{id}(id=${rating.id})}">Delete</a>
+						<a th:href="@{/rating/update/{id}(id=${rating.id})}">Edit</a>&nbsp;|&nbsp;
+						<a th:href="@{/rating/delete/{id}(id=${rating.id})}">Delete</a>
 					</td>
 				</tr>
 			</tbody>

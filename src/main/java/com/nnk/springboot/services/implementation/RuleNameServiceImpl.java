@@ -34,6 +34,10 @@ public class RuleNameServiceImpl implements RuleNameService {
         RuleName updatedRuleName = getRuleNameById(id);
         updatedRuleName.setName(ruleName.getName());
         updatedRuleName.setDescription(ruleName.getDescription());
+        updatedRuleName.setJson(ruleName.getJson());
+        updatedRuleName.setTemplate(ruleName.getTemplate());
+        updatedRuleName.setSqlStr(ruleName.getSqlStr());
+        updatedRuleName.setSqlPart(ruleName.getSqlPart());
         ruleNameRepository.save(updatedRuleName);
     }
 

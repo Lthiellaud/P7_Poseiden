@@ -22,8 +22,7 @@ public class RatingController {
     private static final Logger LOGGER = LoggerFactory.getLogger(RatingController.class);
     
     @RequestMapping("/rating/list")
-    public String home(Model model)
-    {
+    public String home(Model model) {
         model.addAttribute("ratings", ratingService.getAllRating());
         return "rating/list";
     }
