@@ -1,5 +1,8 @@
 package com.nnk.springboot.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
@@ -7,6 +10,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "trade")
+@Getter
+@Setter
 public class Trade {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

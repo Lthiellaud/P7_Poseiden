@@ -165,7 +165,6 @@ class CurveControllerTest {
     @Test
     public void postCurvePointUpdate() throws Exception {
         mockMvc.perform(post("/curvePoint/update/0")
-                    .param("id", "0")
                     .param("curveId", "10")
                     .param("term", "10")
                     .param("value", "10")

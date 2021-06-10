@@ -72,7 +72,7 @@ public class CurveController {
         }
         try {
             curvePointService.updateCurvePoint(curvePoint, id);
-            LOGGER.info("Curve point id " + id + "added");
+            LOGGER.info("Curve point id " + id + "updated");
             attributes.addFlashAttribute("message", "Update successful");
         } catch (IllegalArgumentException e) {
             LOGGER.error("Error during getting curve point " + e.toString());
