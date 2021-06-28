@@ -43,6 +43,9 @@
 				</tr>
 			</thead>
 			<tbody>
+				<tr th:if="${#lists.isEmpty(curvePoints)}">
+					<td colspan="5">No curve point registered</td>
+				</tr>
 				<tr th:each="curvePoint: ${curvePoints}">
 					<td><span th:text="${curvePoint.id}"> Id </span></td>
 					<td><span th:text="${curvePoint.curveId}"> Curve point id </span></td>

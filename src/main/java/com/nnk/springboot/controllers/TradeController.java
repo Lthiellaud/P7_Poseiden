@@ -16,7 +16,6 @@ import javax.validation.Valid;
 
 @Controller
 public class TradeController {
-    // TODO: Inject Trade service
 
     @Autowired
     private TradeService tradeService;
@@ -87,7 +86,7 @@ public class TradeController {
     }
 
     @GetMapping("/trade/delete/{id}")
-    public String deleteTrade(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
+    public String deleteTrade(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {
             tradeService.deleteTrade(id);
             attributes.addFlashAttribute("message", "Delete successful");

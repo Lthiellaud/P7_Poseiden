@@ -43,6 +43,9 @@
 				</tr>
 			</thead>
 			<tbody>
+				<tr th:if="${#lists.isEmpty(trades)}">
+					<td colspan="5">No trade registered</td>
+				</tr>
 				<tr th:each="trade: ${trades}">
 					<td><span th:text="${trade.tradeId}"> Id </span></td>
 					<td><span th:text="${trade.account}"> Account </span></td>

@@ -13,13 +13,15 @@ import java.sql.Timestamp;
 @Setter
 public class RuleName {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id ;
     @NotBlank(message = "Name is mandatory")
     private String name ;
     private String description ;
     private String json ;
     private String template ;
+    @Column(name="sqlstr")
     private String sqlStr ;
+    @Column(name="sqlpart")
     private String sqlPart ;
 }

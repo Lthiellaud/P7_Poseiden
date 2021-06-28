@@ -1,21 +1,30 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.repositories.UserRepository;
+import com.nnk.springboot.domain.User;
+import com.nnk.springboot.exception.UserAlreadyExistException;
+import com.nnk.springboot.services.UserService;
+import oracle.jrockit.jfr.VMJFR;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import javax.validation.Valid;
 
 @Controller
 public class UserController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @ModelAttribute("user")
     public User initUserAttribute() {
@@ -24,55 +33,84 @@ public class UserController {
     @RequestMapping("/user/list")
     public String home(Model model)
     {
-        model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("users", userService.getAllUser());
         return "user/list";
     }
 
     @GetMapping("/user/add")
-    public String addUser(User user) {
+    public String addUser(Model model) {
+        model.addAttribute("user", new User());
         return "user/add";
     }
 
     @PostMapping("/user/validate")
-    public String validate(@Valid User user, BindingResult result, Model model) {
+    public String validate(@ModelAttribute @Valid User user, BindingResult result, Model model) {
         if (!result.hasErrors()) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            user.setPassword(encoder.encode(user.getPassword()));
-            userRepository.save(user);
-            model.addAttribute("users", userRepository.findAll());
-            return "redirect:/user/list";
+            try {
+                userService.createUser(user);
+                model.addAttribute("message", "Add successful");
+                model.addAttribute("user", new User());
+                LOGGER.info("User added");
+            } catch (UserAlreadyExistException e) {
+                LOGGER.error("Error during adding User " + e.getMessage());
+                model.addAttribute("message", e.getMessage());
+            } catch (Exception e) {
+                LOGGER.error("Error during adding User " + e.toString());
+                model.addAttribute("message", "Issue during creating user, please retry later");
+            }
+
         }
         return "user/add";
     }
 
     @GetMapping("/user/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        user.setPassword("");
-        model.addAttribute("user", user);
-        return "user/update";
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
+        try {
+            model.addAttribute("user", userService.getUserById(id));
+            return "user/update";
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Error during getting User " + e.toString());
+            attributes.addFlashAttribute("message", e.getMessage());
+            return "redirect:/user/list";
+        }
     }
 
     @PostMapping("/user/update/{id}")
     public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") @Valid User user,
-                             BindingResult result, Model model) {
+                             BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             return "user/update";
         }
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setId(id);
-        userRepository.save(user);
-        model.addAttribute("users", userRepository.findAll());
+        try {
+            userService.updateUser(user, id);
+            attributes.addFlashAttribute("message", "Update successful");
+            LOGGER.info("User id " + id + " updated");
+        } catch (IllegalArgumentException e) {
+            attributes.addFlashAttribute("message", e.getMessage());
+            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+        } catch (Exception e) {
+            attributes.addFlashAttribute("message", "Issue during updating, please retry later");
+            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+        }
+        //model.addAttribute("users", userService.getAllUser());
         return "redirect:/user/list";
     }
 
     @GetMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable("id") Integer id, Model model) {
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        userRepository.delete(user);
-        model.addAttribute("users", userRepository.findAll());
+    public String deleteUser(@PathVariable("id") Integer id, RedirectAttributes attributes) {
+        try {
+            userService.deleteUser(id);
+            attributes.addFlashAttribute("message", "Delete successful");
+            LOGGER.info("User id "+ id + " deleted");
+        } catch (IllegalArgumentException e) {
+            attributes.addFlashAttribute("message", e.getMessage());
+            LOGGER.error("Error during deleting User id " + id + " " + e.toString());
+        } catch (Exception e) {
+            attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
+            LOGGER.error("Error during deleting User id " + id + " " + e.toString());
+        }
+        //model.addAttribute("users", userService.getAllUser());
         return "redirect:/user/list";
     }
 }

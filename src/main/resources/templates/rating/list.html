@@ -44,6 +44,9 @@
 				</tr>
 			</thead>
 			<tbody>
+				<tr th:if="${#lists.isEmpty(ratings)}">
+					<td colspan="6">No rating registered</td>
+				</tr>
 				<tr th:each="rating :${ratings}">
 					<td><span th:text="${rating.id}"> Id </span></td>
 					<td><span th:text="${rating.moodysRating}"> MoodysRating </span></td>
