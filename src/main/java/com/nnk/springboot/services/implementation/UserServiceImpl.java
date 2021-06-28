@@ -22,13 +22,13 @@ public class UserServiceImpl implements UserService {
      * @param user the User to be created
      */
     @Override
-    public void createUser(User user) throws UserAlreadyExistException {
+    public User createUser(User user) throws UserAlreadyExistException {
         if (getUserByUsername(user.getUsername()).isPresent()) {
-            throw new UserAlreadyExistException("User already exists for this email");
+            throw new UserAlreadyExistException("This username already exists, please, choose an other one");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     /**
