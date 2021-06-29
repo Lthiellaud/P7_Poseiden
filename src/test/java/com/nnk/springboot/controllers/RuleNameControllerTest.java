@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.RuleName;
 import com.nnk.springboot.services.RuleNameService;
+import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,13 +30,16 @@ class RuleNameControllerTest {
     @MockBean
     private RuleNameService ruleNameService;
 
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
     @Test
     public void getRuleNameListWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/ruleName/list"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRuleNameList() throws Exception {
         RuleName ruleName = new RuleName();
@@ -48,16 +54,36 @@ class RuleNameControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("ruleName/list"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(model().attribute("ruleNames", ruleNames));
+                .andExpect(model().attribute("ruleNames", ruleNames))
+                .andExpect(content().string(containsString("&nbsp;|&nbsp;<a href=\"/user/list\">User</a>")));
+    }
+
+    @WithMockUser(username = "user", authorities = {"USER"})
+    @Test
+    public void getRuleNameListAsUSER() throws Exception {
+        RuleName ruleName = new RuleName();
+        ruleName.setName("Rule name");
+        ruleName.setDescription("Rule description");
+        ruleName.setId(1);
+        List<RuleName> ruleNames = new ArrayList<>();
+        ruleNames.add(ruleName);
+        when(ruleNameService.getAllRuleName()).thenReturn(ruleNames);
+
+        mockMvc.perform(get("/ruleName/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("ruleName/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("ruleNames", ruleNames))
+                .andExpect(content().string(not(containsString("&nbsp;|&nbsp;<a href=\"/user/list\">User</a>"))));
     }
 
     @Test
     public void getRuleNameAddWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/ruleName/add"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRuleNameAdd() throws Exception {
         mockMvc.perform(get("/ruleName/add"))
@@ -69,10 +95,10 @@ class RuleNameControllerTest {
     @Test
     public void getRuleNameUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/ruleName/update/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRuleNameUpdateWithException() throws Exception {
         when(ruleNameService.getRuleNameById(0)).thenThrow(new IllegalArgumentException("Invalid curve point Id:0"));
@@ -83,7 +109,7 @@ class RuleNameControllerTest {
                 .andExpect(flash().attribute("message", "Invalid curve point Id:0"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRuleNameUpdate() throws Exception {
         RuleName ruleName = new RuleName();
@@ -102,10 +128,10 @@ class RuleNameControllerTest {
     @Test
     public void getRuleNameDeleteWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/ruleName/delete/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRuleNameDelete() throws Exception {
 
@@ -120,10 +146,10 @@ class RuleNameControllerTest {
     public void postRuleNameValidateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/ruleName/validate")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postRuleNameValidate() throws Exception {
         mockMvc.perform(post("/ruleName/validate")
@@ -136,7 +162,7 @@ class RuleNameControllerTest {
                 .andExpect(model().attribute("message", "Add successful"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postRuleNameValidateNameBlank() throws Exception {
         mockMvc.perform(post("/ruleName/validate")
@@ -153,10 +179,10 @@ class RuleNameControllerTest {
     public void postRuleNameUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/ruleName/update/0")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postRuleNameUpdate() throws Exception {
         mockMvc.perform(post("/ruleName/update/0")
@@ -169,7 +195,7 @@ class RuleNameControllerTest {
                 .andExpect(flash().attribute("message", "Update successful"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postRuleNameUpdateNameBlank() throws Exception {
         mockMvc.perform(post("/ruleName/update/0")

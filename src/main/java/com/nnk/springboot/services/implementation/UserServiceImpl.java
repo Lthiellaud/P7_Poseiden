@@ -1,9 +1,11 @@
 package com.nnk.springboot.services.implementation;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.exception.UserAlreadyExistException;
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,18 +19,23 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     /**
      * Creates a new User.
      * @param user the User to be created
      */
     @Override
-    public User createUser(User user) throws UserAlreadyExistException {
+    public void createUser(User user) throws UserAlreadyExistException {
         if (getUserByUsername(user.getUsername()).isPresent()) {
+            LOGGER.error("username already exists");
             throw new UserAlreadyExistException("This username already exists, please, choose an other one");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        LOGGER.error("encoded password " + encoder.encode(user.getPassword()));
         user.setPassword(encoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        LOGGER.debug("User create");
+        userRepository.save(user);
     }
 
     /**
@@ -41,6 +48,7 @@ public class UserServiceImpl implements UserService {
         user.setId(id);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));
+        LOGGER.debug("User update");
         userRepository.save(user);
     }
 
@@ -70,6 +78,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void deleteUser(Integer id) throws IllegalArgumentException {
+        LOGGER.debug("User delete");
         userRepository.delete(getUserById(id));
     }
 

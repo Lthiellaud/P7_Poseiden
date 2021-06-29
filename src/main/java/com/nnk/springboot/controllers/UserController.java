@@ -1,14 +1,11 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.domain.User;
-import com.nnk.springboot.exception.UserAlreadyExistException;
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.services.UserService;
-import oracle.jrockit.jfr.VMJFR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,6 +43,7 @@ public class UserController {
     @PostMapping("/user/validate")
     public String validate(@ModelAttribute @Valid User user, BindingResult result, Model model) {
         if (!result.hasErrors()) {
+            LOGGER.debug("User validate form Ok");
             try {
                 userService.createUser(user);
                 model.addAttribute("message", "Add successful");
@@ -58,8 +56,8 @@ public class UserController {
                 LOGGER.error("Error during adding User " + e.toString());
                 model.addAttribute("message", "Issue during creating user, please retry later");
             }
-
         }
+        LOGGER.debug("Error in user validate form");
         return "user/add";
     }
 
@@ -79,6 +77,7 @@ public class UserController {
     public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") @Valid User user,
                              BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            LOGGER.debug("Error in user update form");
             return "user/update";
         }
 
@@ -94,6 +93,7 @@ public class UserController {
             LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
         }
         //model.addAttribute("users", userService.getAllUser());
+        LOGGER.debug("user update form Ok");
         return "redirect:/user/list";
     }
 

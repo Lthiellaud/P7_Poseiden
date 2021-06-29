@@ -1,4 +1,4 @@
-package com.nnk.springboot.validation;
+package com.nnk.springboot.configuration.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

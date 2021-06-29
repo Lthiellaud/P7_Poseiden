@@ -1,6 +1,6 @@
 package com.nnk.springboot.domain;
 
-import com.nnk.springboot.validation.ValidPassword;
+import com.nnk.springboot.configuration.validation.ValidPassword;
 import lombok.Getter;
 import lombok.Setter;
 
