@@ -1,7 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.exception.UserAlreadyExistException;
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 
 import java.util.List;
 import java.util.Optional;

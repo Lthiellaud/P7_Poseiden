@@ -2,7 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.services.BidListService;
-import org.junit.jupiter.api.Disabled;
+import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,13 +30,16 @@ class BidListControllerTest {
     @MockBean
     private BidListService bidListService;
 
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
     @Test
     public void getBidListListWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/bidList/list"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getBidListList() throws Exception {
         BidList bidList = new BidList();
@@ -50,16 +55,37 @@ class BidListControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("bidList/list"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(model().attribute("bidLists", bidLists));
+                .andExpect(model().attribute("bidLists", bidLists))
+                .andExpect(content().string(containsString("&nbsp;|&nbsp;<a href=\"/user/list\">User</a>")));
+    }
+
+    @WithMockUser(username = "user", authorities = {"USER"})
+    @Test
+    public void getBidListListConnectedAsUser() throws Exception {
+        BidList bidList = new BidList();
+        bidList.setBidListId(1);
+        bidList.setAccount("test");
+        bidList.setType("Type1");
+        bidList.setBidQuantity(10.0);
+        List<BidList> bidLists = new ArrayList<>();
+        bidLists.add(bidList);
+        when(bidListService.getAllBidList()).thenReturn(bidLists);
+
+        mockMvc.perform(get("/bidList/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("bidList/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("bidLists", bidLists))
+                .andExpect(content().string(not(containsString("&nbsp;|&nbsp;<a href=\"/user/list\">User</a>"))));
     }
 
     @Test
     public void getBidListAddWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/bidList/add"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getBidListAdd() throws Exception {
         mockMvc.perform(get("/bidList/add"))
@@ -71,10 +97,10 @@ class BidListControllerTest {
     @Test
     public void getBidListUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/bidList/update/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getBidListUpdateWithException() throws Exception {
         when(bidListService.getBidListById(0)).thenThrow(new IllegalArgumentException("Invalid bid list Id:0"));
@@ -85,7 +111,7 @@ class BidListControllerTest {
                 .andExpect(flash().attribute("message", "Invalid bid list Id:0"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getBidListUpdate() throws Exception {
         BidList bidList = new BidList();
@@ -105,10 +131,10 @@ class BidListControllerTest {
     @Test
     public void getBidListDeleteWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/bidList/delete/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getBidListDelete() throws Exception {
 
@@ -123,10 +149,10 @@ class BidListControllerTest {
     public void postBidListValidateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/bidList/validate")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postBidListValidate() throws Exception {
         mockMvc.perform(post("/bidList/validate")
@@ -140,7 +166,7 @@ class BidListControllerTest {
                 .andExpect(model().attribute("message", "Add successful"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postBidListValidateAccountEmpty() throws Exception {
         mockMvc.perform(post("/bidList/validate")
@@ -154,7 +180,7 @@ class BidListControllerTest {
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "account", "NotBlank"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postBidListValidateTypeEmpty() throws Exception {
         mockMvc.perform(post("/bidList/validate")
@@ -172,10 +198,10 @@ class BidListControllerTest {
     public void postBidListUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/bidList/update/0")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postBidListUpdate() throws Exception {
 
@@ -189,7 +215,7 @@ class BidListControllerTest {
                 .andExpect(model().hasNoErrors());
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postBidListUpdateAccountEmpty() throws Exception {
         BidList bidList = new BidList();
@@ -210,7 +236,7 @@ class BidListControllerTest {
                 .andExpect(model().attributeHasFieldErrorCode("bidList", "account", "NotBlank"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "user", authorities = {"USER"})
     @Test
     public void postBidListUpdateTypeEmpty() throws Exception {
         BidList bidList = new BidList();

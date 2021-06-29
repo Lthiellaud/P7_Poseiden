@@ -1,7 +1,7 @@
 package com.nnk.springboot.services;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.exception.UserAlreadyExistException;
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.nnk.springboot.exception;
+package com.nnk.springboot.configuration.exception;
 
 public class UserAlreadyExistException extends Exception {
 

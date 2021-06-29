@@ -1,5 +1,6 @@
 package com.nnk.springboot.domain;
 
+import com.nnk.springboot.configuration.validation.ValidPassword;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +18,7 @@ public class User {
     @NotBlank(message = "Username is mandatory")
     @Column(unique = true)
     private String username;
-    @NotBlank(message = "Password is mandatory")
+    @ValidPassword
     private String password;
     @NotBlank(message = "FullName is mandatory")
     private String fullname;

@@ -1,7 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.services.UserService;
+import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +15,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,13 +33,16 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
     @Test
     public void getUserListWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/user/list"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getUserList() throws Exception {
         User user = new User();
@@ -50,16 +59,28 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/list"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(model().attribute("users", users));
+                .andExpect(model().attribute("users", users))
+                .andExpect(content().string(containsString("&nbsp;|&nbsp;<a href=\"/user/list\">User</a>")));
+    }
+
+    @WithMockUser(username = "user", authorities = {"USER"})
+    @Test
+    public void getUserListWithUSERAuthority() throws Exception {
+
+        mockMvc.perform(get("/user/list"))
+                .andExpect(status().is(403))
+                .andExpect(forwardedUrl("/app/error"));
+
+
     }
 
     @Test
     public void getUserAddWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/user/add"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getUserAdd() throws Exception {
         mockMvc.perform(get("/user/add"))
@@ -71,10 +92,10 @@ class UserControllerTest {
     @Test
     public void getUserUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/user/update/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getUserUpdateWithException() throws Exception {
         when(userService.getUserById(0)).thenThrow(new IllegalArgumentException("Invalid user Id:0"));
@@ -85,7 +106,7 @@ class UserControllerTest {
                 .andExpect(flash().attribute("message", "Invalid user Id:0"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getUserUpdate() throws Exception {
         User user = new User();
@@ -106,10 +127,10 @@ class UserControllerTest {
     @Test
     public void getUserDeleteWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/user/delete/0"))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getUserDelete() throws Exception {
 
@@ -124,75 +145,128 @@ class UserControllerTest {
     public void postUserValidateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/user/validate")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
-    public void postUserValidate() throws Exception {
+    public void postUserValidateExistingUser() throws Exception {
         mockMvc.perform(post("/user/validate")
-                    .param("account", "test")
-                    .param("type", "type")
-                    .param("buyQuantity", "10")
-                    .with(csrf()))
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@Test5")
+                .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/add"))
                 .andExpect(model().hasNoErrors())
                 .andExpect(model().attribute("message", "Add successful"));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
-    public void postUserValidateAccountEmpty() throws Exception {
+    public void postUserValidateEmpty() throws Exception {
         mockMvc.perform(post("/user/validate")
-                .param("account", " ")
-                .param("type", "type")
-                .param("buyQuantity", "10")
+                .param("username", "")
+                .param("fullname", "")
+                .param("role", "")
+                .param("password", "")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/add"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("user", "account", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("user", "username", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "fullname", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "role", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"))
+        ;
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
-    public void postUserValidateTypeEmpty() throws Exception {
+    public void postUserValidatePasswordTooShort() throws Exception {
         mockMvc.perform(post("/user/validate")
-                .param("account", "account")
-                .param("type", "")
-                .param("buyQuantity", "10")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "U@t5")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/add"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("user", "type", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserValidatePasswordWithoutNumber() throws Exception {
+        mockMvc.perform(post("/user/validate")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/add"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserValidatePasswordWithoutSpecialChar() throws Exception {
+        mockMvc.perform(post("/user/validate")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "UserTest5")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/add"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserValidatePasswordWithoutUppercase() throws Exception {
+        mockMvc.perform(post("/user/validate")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "user@test5")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/add"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
     }
 
     @Test
     public void postUserUpdateWithoutAuthentication() throws Exception {
         mockMvc.perform(post("/user/update/0")
                 .with(csrf()))
-                .andExpect(status().is(401));
+                .andExpect(status().is(302));
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postUserUpdate() throws Exception {
 
         mockMvc.perform(post("/user/update/0")
-                .param("account", "test")
-                .param("type", "type")
-                .param("buyQuantity", "10")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test5")
                 .with(csrf()))
                 .andExpect(status().is(302))
                 .andExpect(view().name("redirect:/user/list"))
                 .andExpect(model().hasNoErrors());
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
-    public void postUserUpdateAccountEmpty() throws Exception {
+    public void postUserUpdateEmpty() throws Exception {
         User user = new User();
         user.setId(1);
         user.setUsername("user");
@@ -202,19 +276,24 @@ class UserControllerTest {
         when(userService.getUserById(1)).thenReturn(user);
 
         mockMvc.perform(post("/user/update/1")
-                .param("account", "")
-                .param("type", "type")
-                .param("buyQuantity", "10")
+                .param("username", "")
+                .param("fullname", "")
+                .param("role", "")
+                .param("password", "")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/update"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("user", "account", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("user", "username", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "fullname", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "role", "NotBlank"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"))
+        ;
     }
 
-    @WithMockUser
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
-    public void postUserUpdateTypeEmpty() throws Exception {
+    public void postUserUpdatePasswordInvalid() throws Exception {
         User user = new User();
         user.setId(1);
         user.setUsername("user");
@@ -224,14 +303,15 @@ class UserControllerTest {
         when(userService.getUserById(1)).thenReturn(user);
 
         mockMvc.perform(post("/user/update/1")
-                .param("account", "account")
-                .param("type", "")
-                .param("buyQuantity", "10")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/update"))
                 .andExpect(model().hasErrors())
-                .andExpect(model().attributeHasFieldErrorCode("user", "type", "NotBlank"));
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
     }
 
 
