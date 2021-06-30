@@ -7,6 +7,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 
+/**
+ * Rule name
+ */
 @Entity
 @Table(name = "rulename")
 @Getter

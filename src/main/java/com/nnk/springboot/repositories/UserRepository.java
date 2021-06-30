@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 
+/**
+ * gives access to User records.
+ */
 public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
     /**
      * To retrieve a user from his username

@@ -4,6 +4,9 @@ import com.nnk.springboot.domain.BidList;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
+/**
+ * gives access to BidList records.
+ */
 public interface BidListRepository extends JpaRepository<BidList, Integer> {
 
 }

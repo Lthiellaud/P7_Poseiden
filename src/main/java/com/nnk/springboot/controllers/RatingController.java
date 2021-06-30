@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+/**
+ * To manage CRUD operations for Rating
+ */
 @Controller
 public class RatingController {
 
@@ -20,19 +23,36 @@ public class RatingController {
     private RatingService ratingService;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(RatingController.class);
-    
+
+    /**
+     * To return rating page
+     * @param model filled with list of all rating
+     * @return rating page
+     */
     @RequestMapping("/rating/list")
     public String home(Model model) {
         model.addAttribute("ratings", ratingService.getAllRating());
         return "rating/list";
     }
 
+    /**
+     * To display the add form
+     * @param model initialised with a new rating
+     * @return the add form
+     */
     @GetMapping("/rating/add")
     public String addRatingForm(Model model) {
         model.addAttribute("rating", new Rating());
         return "rating/add";
     }
 
+    /**
+     * To create a rating
+     * @param rating the rating entered
+     * @param result the eventual errors in the form
+     * @param model model of the rating to be created, initialised with a new rating if success
+     * @return The add form, either with binding errors or with a new rating
+     */
     @PostMapping("/rating/validate")
     public String validate(@ModelAttribute @Valid Rating rating, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -50,6 +70,13 @@ public class RatingController {
         return "rating/add";
     }
 
+    /**
+     * To display the update form initialised with the data of the rating to be updated
+     * @param id id of the rating to be updated
+     * @param model model with the rating to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return update form if success, rating list otherwise
+     */
     @GetMapping("/rating/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
         try {
@@ -62,9 +89,17 @@ public class RatingController {
         }
     }
 
+    /**
+     * To update a rating 
+     * @param id id of the rating to be updated
+     * @param rating Updated data for the rating
+     * @param result the eventual errors in the form
+     * @param attributes Message to be displayed on redirect page
+     * @return rating list if success, update form with errors otherwise
+     */
     @PostMapping("/rating/update/{id}")
     public String updateRating(@PathVariable("id") Integer id, @ModelAttribute @Valid Rating rating,
-                             BindingResult result, Model model, RedirectAttributes attributes) {
+                             BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             rating.setId(id);
             return "rating/update";
@@ -83,8 +118,14 @@ public class RatingController {
         return "redirect:/rating/list";
     }
 
+    /**
+     * To delete a rating
+     * @param id id of the rating to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return rating list page
+     */
     @GetMapping("/rating/delete/{id}")
-    public String deleteRating(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
+    public String deleteRating(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {
             ratingService.deleteRating(id);
             LOGGER.info("Delete of rating id " + id + " successful");

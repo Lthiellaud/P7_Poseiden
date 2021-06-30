@@ -14,6 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+/**
+ * To manage CRUD operations for Trade
+ */
 @Controller
 public class TradeController {
 
@@ -22,6 +25,11 @@ public class TradeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TradeController.class);
 
+    /**
+     * To return trade page
+     * @param model filled with list of all trade
+     * @return trade page
+     */
     @RequestMapping("/trade/list")
     public String home(Model model)
     {
@@ -29,12 +37,24 @@ public class TradeController {
         return "trade/list";
     }
 
+    /**
+     * To display the add form
+     * @param model initialised with a new trade
+     * @return the add form
+     */
     @GetMapping("/trade/add")
     public String addUser(Model model) {
         model.addAttribute("trade", new Trade());
         return "trade/add";
     }
 
+    /**
+     * To create a trade
+     * @param trade the trade entered
+     * @param result the eventual errors in the form
+     * @param model model of the trade to be created, initialised with a new trade if success
+     * @return The add form, either with binding errors or with a new trade
+     */
     @PostMapping("/trade/validate")
     public String validate(@ModelAttribute @Valid Trade trade, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -52,6 +72,13 @@ public class TradeController {
         return "trade/add";
     }
 
+    /**
+     * To display the update form initialised with the data of the trade to be updated
+     * @param id id of the trade to be updated
+     * @param model model with the trade to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return update form if success, trade list otherwise
+     */
     @GetMapping("/trade/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
         try {
@@ -65,6 +92,14 @@ public class TradeController {
 
     }
 
+    /**
+     * To update a trade 
+     * @param id id of the trade to be updated
+     * @param trade Updated data for the trade
+     * @param result the eventual errors in the form
+     * @param attributes Message to be displayed on redirect page
+     * @return trade list if success, update form with errors otherwise
+     */
     @PostMapping("/trade/update/{id}")
     public String updateTrade(@PathVariable("id") Integer id, @ModelAttribute @Valid Trade trade,
                              BindingResult result, Model model, RedirectAttributes attributes) {
@@ -86,6 +121,12 @@ public class TradeController {
         return "redirect:/trade/list";
     }
 
+    /**
+     * To delete a trade
+     * @param id id of the trade to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return trade list page
+     */
     @GetMapping("/trade/delete/{id}")
     public String deleteTrade(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {

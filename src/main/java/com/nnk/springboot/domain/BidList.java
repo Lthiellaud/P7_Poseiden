@@ -7,6 +7,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 
+
+/**
+ * Bid list
+ */
 @Entity
 @Table(name = "bidlist")
 @Getter

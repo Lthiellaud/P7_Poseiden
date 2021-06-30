@@ -45,6 +45,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUser(User user, Integer id) throws Exception {
+        if (getUserByUsername(user.getUsername()).isPresent()) {
+            LOGGER.error("username already exists");
+            throw new UserAlreadyExistException("This username already exists, please, choose an other one");
+        }
         user.setId(id);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));

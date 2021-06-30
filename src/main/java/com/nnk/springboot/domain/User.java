@@ -7,6 +7,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * User
+ */
 @Entity
 @Table(name = "users")
 @Getter

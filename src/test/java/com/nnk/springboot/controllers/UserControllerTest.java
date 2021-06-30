@@ -1,5 +1,6 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.services.UserService;
 import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
@@ -360,6 +361,22 @@ class UserControllerTest {
                 .andExpect(view().name("redirect:/user/list"))
                 .andExpect(model().hasNoErrors())
                 .andExpect(flash().attribute("message", "Invalid user Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserUpdateWithUserAlreadyExistException() throws Exception {
+        doThrow(new UserAlreadyExistException("This username already exists, please, choose an other one")).when(userService).updateUser(any(User.class), eq(0));
+        mockMvc.perform(post("/user/update/0")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test5")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "This username already exists, please, choose an other one"));
     }
 
     @WithMockUser(username = "admin", authorities = {"ADMIN"})

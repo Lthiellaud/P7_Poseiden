@@ -10,6 +10,9 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 
+/**
+ * Curve point
+ */
 @Entity
 @Table(name = "curvepoint")
 @Getter

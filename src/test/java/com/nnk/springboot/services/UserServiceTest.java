@@ -62,6 +62,13 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUserWithExistingUsernameTest() throws Exception {
+        when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(user));
+        assertThrows(UserAlreadyExistException.class, () -> userService.updateUser(user, 1));
+        verify(userRepository, times(0)).save(any(User.class));
+    }
+
+    @Test
     void getUserByIdTest() {
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
         User user1 = userService.getUserById(1);

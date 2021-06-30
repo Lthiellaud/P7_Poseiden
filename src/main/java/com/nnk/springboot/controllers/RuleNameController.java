@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
+/**
+ * To manage CRUD operations for RuleName
+ */
 @Controller
 public class RuleNameController {
 
@@ -21,6 +24,11 @@ public class RuleNameController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleNameController.class);
 
+    /**
+     * To return rule name page
+     * @param model filled with list of all rule name
+     * @return rule name page
+     */
     @RequestMapping("/ruleName/list")
     public String home(Model model)
     {
@@ -28,12 +36,24 @@ public class RuleNameController {
         return "ruleName/list";
     }
 
+    /**
+     * To display the add form
+     * @param model initialised with a new rule name
+     * @return the add form
+     */
     @GetMapping("/ruleName/add")
     public String addRuleForm(Model model) {
         model.addAttribute("ruleName", new RuleName());
         return "ruleName/add";
     }
 
+    /**
+     * To create a rule name
+     * @param ruleName the rule name entered
+     * @param result the eventual errors in the form
+     * @param model model of the rule name to be created, initialised with a new rule name if success
+     * @return The add form, either with binding errors or with a new rule name
+     */
     @PostMapping("/ruleName/validate")
     public String validate(@ModelAttribute @Valid RuleName ruleName, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -51,6 +71,13 @@ public class RuleNameController {
         return "ruleName/add";
     }
 
+    /**
+     * To display the update form initialised with the data of the rule name to be updated
+     * @param id id of the rule name to be updated
+     * @param model model with the rule name to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return update form if success, rule name list otherwise
+     */
     @GetMapping("/ruleName/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
         try {
@@ -63,9 +90,17 @@ public class RuleNameController {
         return "redirect:/ruleName/list";
     }
 
+    /**
+     * To update a rule name 
+     * @param id id of the rule name to be updated
+     * @param ruleName Updated data for the ruleName
+     * @param result the eventual errors in the form
+     * @param attributes Message to be displayed on redirect page
+     * @return rule name list if success, update form with errors otherwise
+     */
     @PostMapping("/ruleName/update/{id}")
     public String updateRuleName(@PathVariable("id") Integer id, @ModelAttribute @Valid RuleName ruleName,
-                             BindingResult result, Model model, RedirectAttributes attributes) {
+                             BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             ruleName.setId(id);
             return "ruleName/update";
@@ -84,8 +119,14 @@ public class RuleNameController {
         return "redirect:/ruleName/list";
     }
 
+    /**
+     * To delete a rule name
+     * @param id id of the rule name to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return rule name list page
+     */
     @GetMapping("/ruleName/delete/{id}")
-    public String deleteRuleName(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
+    public String deleteRuleName(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {
             ruleNameService.deleteRuleName(id);
             LOGGER.info("Rule name id " + id + "deleted");

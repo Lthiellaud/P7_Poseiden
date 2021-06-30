@@ -13,7 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
-
+/**
+ * To manage CRUD operations for BidList
+ */
 @Controller
 public class BidListController {
 
@@ -22,18 +24,35 @@ public class BidListController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BidListController.class);
 
+    /**
+     * To return bid list page
+     * @param model filled with list of all bid list
+     * @return bid list page
+     */
     @RequestMapping("/bidList/list")
     public String home(Model model) {
         model.addAttribute("bidLists", bidListService.getAllBidList());
         return "bidList/list";
     }
 
+    /**
+     * To display the add form
+     * @param model initialised with a new bid list
+     * @return the add form
+     */
     @GetMapping("/bidList/add")
     public String addBidForm(Model model) {
         model.addAttribute("bidList", new BidList());
         return "bidList/add";
     }
 
+    /**
+     * To create a bid list
+     * @param bid the bid list entered
+     * @param result the eventual errors in the form
+     * @param model model of the bid list to be created, initialised with a new bid list if success
+     * @return The add form, either with binding errors or with a new bid list
+     */
     @PostMapping("/bidList/validate")
     public String validate(@ModelAttribute("bidList") @Valid BidList bid, BindingResult result, Model model) {
         if (!result.hasErrors()) {
@@ -50,6 +69,13 @@ public class BidListController {
         return "bidList/add";
     }
 
+    /**
+     * To display the update form initialised with the data of the bid list to be updated
+     * @param id id of the bid list to be updated
+     * @param model model with the bid list to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return update form if success, bid list list otherwise
+     */
     @GetMapping("/bidList/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model, RedirectAttributes attributes) {
 
@@ -64,9 +90,17 @@ public class BidListController {
         }
     }
 
+    /**
+     * To update a bid list
+     * @param id id of the bid list to be updated
+     * @param bidList Updated data for the bidlist
+     * @param result the eventual errors in the form
+     * @param attributes Message to be displayed on redirect page
+     * @return bid list list if success, update form with errors otherwise
+     */
     @PostMapping("/bidList/update/{id}")
     public String updateBid(@PathVariable("id") Integer id, @ModelAttribute("bidList") @Valid BidList bidList,
-                             BindingResult result, Model model, RedirectAttributes attributes) {
+                             BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             bidList.setBidListId(id);
             return "bidList/update";
@@ -85,6 +119,12 @@ public class BidListController {
         return "redirect:/bidList/list";
     }
 
+    /**
+     * To delete a bid list
+     * @param id id of the bid list to be updated
+     * @param attributes Message to be displayed on redirect page
+     * @return bid list list page
+     */
     @GetMapping("/bidList/delete/{id}")
     public String deleteBid(@PathVariable("id") Integer id, RedirectAttributes attributes) {
         try {

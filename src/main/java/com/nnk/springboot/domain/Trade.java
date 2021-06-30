@@ -8,6 +8,9 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 
 
+/**
+ * Trade
+ */
 @Entity
 @Table(name = "trade")
 @Getter
