@@ -68,6 +68,7 @@ public class BidListController {
     public String updateBid(@PathVariable("id") Integer id, @ModelAttribute("bidList") @Valid BidList bidList,
                              BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            bidList.setBidListId(id);
             return "bidList/update";
         }
         try {

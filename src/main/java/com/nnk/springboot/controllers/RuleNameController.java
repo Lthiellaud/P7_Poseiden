@@ -67,6 +67,7 @@ public class RuleNameController {
     public String updateRuleName(@PathVariable("id") Integer id, @ModelAttribute @Valid RuleName ruleName,
                              BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            ruleName.setId(id);
             return "ruleName/update";
         }
         try {

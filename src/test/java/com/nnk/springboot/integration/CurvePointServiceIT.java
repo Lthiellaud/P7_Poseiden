@@ -8,6 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.TimeZone;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,10 +44,13 @@ public class CurvePointServiceIT {
         curvePoint.setValue(2.0);
 
         curvePointService.updateCurvePoint(curvePoint, 1);
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        Timestamp ts = Timestamp.valueOf("2012-12-12 00:00:00");
 
         assertThat(curvePointService.getCurvePointById(1).getCurveId()).isEqualTo(1);
         assertThat(curvePointService.getCurvePointById(1).getTerm()).isEqualTo(8.0);
         assertThat(curvePointService.getCurvePointById(1).getValue()).isEqualTo(2.0);
+        assertThat(curvePointService.getCurvePointById(1).getAsOfDate()).isEqualTo(ts);
 
     }
 

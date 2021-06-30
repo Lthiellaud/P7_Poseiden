@@ -78,6 +78,7 @@ public class UserController {
                              BindingResult result, RedirectAttributes attributes) {
         if (result.hasErrors()) {
             LOGGER.debug("Error in user update form");
+            user.setId(id);
             return "user/update";
         }
 

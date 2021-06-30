@@ -67,6 +67,7 @@ public class CurveController {
     public String updateCurve(@PathVariable("id") Integer id, @ModelAttribute @Valid CurvePoint curvePoint,
                               BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            curvePoint.setId(id);
             return "curvePoint/update";
         }
         try {

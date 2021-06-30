@@ -43,6 +43,7 @@ public class TradeServiceIT {
         assertThat(tradeService.getTradeById(1).getAccount()).isEqualTo("Account updated");
         assertThat(tradeService.getTradeById(1).getType()).isEqualTo("Type updated");
         assertThat(tradeService.getTradeById(1).getBuyQuantity()).isEqualTo(1.5);
+        assertThat(tradeService.getTradeById(1).getBenchmark()).isEqualTo("benchmark");
 
     }
 

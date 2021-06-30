@@ -44,6 +44,7 @@ public class BidListServiceIT {
         assertThat(bidListService.getBidListById(1).getAccount()).isEqualTo("Account updated");
         assertThat(bidListService.getBidListById(1).getType()).isEqualTo("Type updated");
         assertThat(bidListService.getBidListById(1).getBidQuantity()).isEqualTo(1.5);
+        assertThat(bidListService.getBidListById(1).getBenchmark()).isEqualTo("benchmark");
 
     }
 

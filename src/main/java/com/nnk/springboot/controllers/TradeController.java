@@ -69,6 +69,7 @@ public class TradeController {
     public String updateTrade(@PathVariable("id") Integer id, @ModelAttribute @Valid Trade trade,
                              BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            trade.setTradeId(id);
             return "trade/update";
         }
         try {

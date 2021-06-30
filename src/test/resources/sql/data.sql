@@ -120,14 +120,14 @@ insert into Users(fullname, username, password, role)
     values("User", "user", "$2a$10$9Ehdj.GBlKpydcstWooFqezfBXp.4HKYONh5I4otDw/UVK99LtIJy", "USER");
 
 /* Table Trade */
-insert into `trade` (`account`, `type`, `buyQuantity`)
-    values ( 'toBeUpdated', 'Type1', 1);
+insert into `trade` (`account`, `type`, `buyQuantity`, `benchmark`)
+    values ( 'toBeUpdated', 'Type1', 1, 'benchmark');
 insert into `trade` (`account`, `type`, `buyQuantity`)
     values ( 'toBeDeleted', 'Type2', 2);
 
 /* Table CurvePoint */
-insert into `curvepoint` (`curveId`, `term`, `value`)
-    values ( 10, 10.5, 10.6);
+insert into `curvepoint` (`curveId`, `term`, `value`, `asOfDate`)
+    values ( 10, 10.5, 10.6, '2012-12-12');
 insert into `curvepoint` (`curveId`, `term`, `value`)
     values ( 20, 20.5, 20.6);
 
@@ -144,8 +144,8 @@ insert into `rulename` (`name`, `description`, `json`, `template`, `sqlStr`, `sq
     values ( 'toBeDeleted', 'description', 'json', 'template', 'sqlStr', 'sqlPart');
 
 /* Table BidList */
-insert into `bidlist` (`account`, `type`, `bidQuantity`)
-    values ( 'toBeUpdated', 'Type', 1);
+insert into `bidlist` (`account`, `type`, `bidQuantity`, `benchmark`)
+    values ( 'toBeUpdated', 'Type', 1, 'benchmark');
 insert into `bidlist` (`account`, `type`, `bidQuantity`)
     values ( 'toBeDeleted', 'Type2', 2);
 

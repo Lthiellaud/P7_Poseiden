@@ -66,6 +66,7 @@ public class RatingController {
     public String updateRating(@PathVariable("id") Integer id, @ModelAttribute @Valid Rating rating,
                              BindingResult result, Model model, RedirectAttributes attributes) {
         if (result.hasErrors()) {
+            rating.setId(id);
             return "rating/update";
         }
         try {
