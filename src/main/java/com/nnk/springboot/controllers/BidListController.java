@@ -43,7 +43,7 @@ public class BidListController {
                 model.addAttribute("bidList", new BidList());
                 model.addAttribute("message", "Add successful");
             } catch (Exception e) {
-                LOGGER.error("Error during adding BindList " + e.toString());
+                LOGGER.error("Error during adding bind list " + e.toString());
                 model.addAttribute("message", "Issue during creating, please retry later");
             }
         }
@@ -75,10 +75,10 @@ public class BidListController {
             LOGGER.info("BidList id " + id + " updated");
             attributes.addFlashAttribute("message", "Update successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting BindList " + e.toString());
+            LOGGER.error("Error during updating bind list " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during updating BindList " + e.toString());
+            LOGGER.error("Error during updating bind list " + e.toString());
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
         }
         return "redirect:/bidList/list";
@@ -91,10 +91,10 @@ public class BidListController {
             LOGGER.info("BidList id " + id + " deleted");
             attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+            LOGGER.error("Error during deleting bind list id " + id + " " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during deleting BindList " + id + " "  + e.toString());
+            LOGGER.error("Error during deleting bind list " + id + " "  + e.toString());
             attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
         }
         return "redirect:/bidList/list";

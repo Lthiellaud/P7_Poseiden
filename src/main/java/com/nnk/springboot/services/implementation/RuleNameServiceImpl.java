@@ -20,7 +20,7 @@ public class RuleNameServiceImpl implements RuleNameService {
      * @param ruleName the RuleName to be created
      */
     @Override
-    public void createRuleName(RuleName ruleName) {
+    public void createRuleName(RuleName ruleName) throws Exception {
         ruleNameRepository.save(ruleName);
     }
 
@@ -30,7 +30,7 @@ public class RuleNameServiceImpl implements RuleNameService {
      * @param id id of the ruleName to be updated
      */
     @Override
-    public void updateRuleName(RuleName ruleName, Integer id) {
+    public void updateRuleName(RuleName ruleName, Integer id) throws Exception {
         RuleName updatedRuleName = getRuleNameById(id);
         updatedRuleName.setName(ruleName.getName());
         updatedRuleName.setDescription(ruleName.getDescription());
@@ -66,7 +66,7 @@ public class RuleNameServiceImpl implements RuleNameService {
      * @param id the id
      */
     @Override
-    public void deleteRuleName(Integer id) throws IllegalArgumentException {
+    public void deleteRuleName(Integer id) throws Exception {
         ruleNameRepository.delete(getRuleNameById(id));
     }
 }

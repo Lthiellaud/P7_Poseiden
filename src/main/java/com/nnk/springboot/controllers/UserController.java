@@ -87,10 +87,10 @@ public class UserController {
             LOGGER.info("User id " + id + " updated");
         } catch (IllegalArgumentException e) {
             attributes.addFlashAttribute("message", e.getMessage());
-            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+            LOGGER.error("Error during updating user id " + id + " " + e.toString());
         } catch (Exception e) {
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
-            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+            LOGGER.error("Error during updating user id " + id + " " + e.toString());
         }
         //model.addAttribute("users", userService.getAllUser());
         LOGGER.debug("user update form Ok");

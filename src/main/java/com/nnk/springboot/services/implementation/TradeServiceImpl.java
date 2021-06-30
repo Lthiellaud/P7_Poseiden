@@ -20,7 +20,7 @@ public class TradeServiceImpl implements TradeService {
      * @param trade the Trade to be created
      */
     @Override
-    public void createTrade(Trade trade) {
+    public void createTrade(Trade trade) throws Exception {
         trade.setCreationDate(new Timestamp(System.currentTimeMillis()));
         tradeRepository.save(trade);
     }
@@ -31,7 +31,7 @@ public class TradeServiceImpl implements TradeService {
      * @param id id of the trade to be updated
      */
     @Override
-    public void updateTrade(Trade trade, Integer id) {
+    public void updateTrade(Trade trade, Integer id) throws Exception {
         Trade updatedTrade = getTradeById(id);
         updatedTrade.setAccount(trade.getAccount());
         updatedTrade.setBuyQuantity(trade.getBuyQuantity());
@@ -65,7 +65,7 @@ public class TradeServiceImpl implements TradeService {
      * @param id the id
      */
     @Override
-    public void deleteTrade(Integer id) throws IllegalArgumentException {
+    public void deleteTrade(Integer id) throws Exception {
         tradeRepository.delete(getTradeById(id));
     }
 }

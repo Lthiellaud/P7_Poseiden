@@ -74,10 +74,10 @@ public class CurveController {
             LOGGER.info("Curve point id " + id + "updated");
             attributes.addFlashAttribute("message", "Update successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting curve point " + e.toString());
+            LOGGER.error("Error during updating curve point " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during getting curve point " + e.toString());
+            LOGGER.error("Error during updating curve point " + e.toString());
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
         }
         return "redirect:/curvePoint/list";
@@ -90,7 +90,7 @@ public class CurveController {
             LOGGER.info("Curve point id " + id + " deleted");
             attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting curve point id " + id + " " + e.toString());
+            LOGGER.error("Error during deleting curve point id " + id + " " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
             LOGGER.error("Error during deleting curve point " + e.toString());

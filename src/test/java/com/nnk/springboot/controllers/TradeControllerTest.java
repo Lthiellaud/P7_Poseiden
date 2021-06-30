@@ -10,11 +10,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -255,6 +259,75 @@ class TradeControllerTest {
                 .andExpect(view().name("trade/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("trade", "type", "NotBlank"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postTradeValidateWithException() throws Exception {
+        doThrow(new SQLException()).when(tradeService).createTrade(any(Trade.class));
+        mockMvc.perform(post("/trade/validate")
+                .param("account", "test")
+                .param("type", "type")
+                .param("buyQuantity", "10")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("trade/add"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Issue during creating trade, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postTradeUpdateWithException() throws Exception {
+        doThrow(new Exception()).when(tradeService).updateTrade(any(Trade.class), eq(0));
+        mockMvc.perform(post("/trade/update/0")
+                .param("account", "test")
+                .param("type", "type")
+                .param("buyQuantity", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/trade/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during updating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postTradeUpdateWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid trade Id:0")).when(tradeService).updateTrade(any(Trade.class), eq(0));
+        mockMvc.perform(post("/trade/update/0")
+                .param("account", "test")
+                .param("type", "type")
+                .param("buyQuantity", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/trade/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid trade Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getTradeDeleteWithException() throws Exception {
+        doThrow(new Exception()).when(tradeService).deleteTrade(eq(0));
+        mockMvc.perform(get("/trade/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/trade/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during deleting, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getTradeDeleteWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid trade Id:0")).when(tradeService).deleteTrade(eq(0));
+        mockMvc.perform(get("/trade/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/trade/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid trade Id:0"));
     }
 
 

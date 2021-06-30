@@ -3,7 +3,6 @@ package com.nnk.springboot.controllers;
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.services.RatingService;
 import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,11 +10,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -106,12 +109,12 @@ class RatingControllerTest {
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void getRatingUpdateWithException() throws Exception {
-        when(ratingService.getRatingById(0)).thenThrow(new IllegalArgumentException("Invalid bid list Id:0"));
+        when(ratingService.getRatingById(0)).thenThrow(new IllegalArgumentException("Invalid rating Id:0"));
         mockMvc.perform(get("/rating/update/0"))
                 .andExpect(status().is(302))
                 .andExpect(view().name("redirect:/rating/list"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(flash().attribute("message", "Invalid bid list Id:0"));
+                .andExpect(flash().attribute("message", "Invalid rating Id:0"));
     }
 
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
@@ -267,6 +270,82 @@ class RatingControllerTest {
                 .andExpect(view().name("rating/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("rating", "sandPRating", "NotBlank"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRatingValidateWithException() throws Exception {
+        doThrow(new SQLException()).when(ratingService).createRating(any(Rating.class));
+        mockMvc.perform(post("/rating/validate")
+                .param("moodysRating", "moody")
+                .param("sandPRating", "sand")
+                .param("fitchRating", "fitch")
+                .param("orderNumber", "10")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("rating/add"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Issue during creating rating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRatingUpdateWithException() throws Exception {
+        doThrow(new Exception()).when(ratingService).updateRating(any(Rating.class), eq(0));
+        mockMvc.perform(post("/rating/update/0")
+                .param("moodysRating", "moody")
+                .param("sandPRating", "sand")
+                .param("fitchRating", "fitch")
+                .param("orderNumber", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/rating/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during updating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRatingUpdateWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid rating Id:0")).when(ratingService).updateRating(any(Rating.class), eq(0));
+        mockMvc.perform(post("/rating/update/0")
+                .param("moodysRating", "moody")
+                .param("sandPRating", "sand")
+                .param("fitchRating", "fitch")
+                .param("orderNumber", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/rating/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid rating Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getRatingDeleteWithException() throws Exception {
+        doThrow(new Exception()).when(ratingService).deleteRating(eq(0));
+        mockMvc.perform(get("/rating/delete/0")
+                .param("moodysRating", "moody")
+                .param("sandPRating", "sand")
+                .param("fitchRating", "fitch")
+                .param("orderNumber", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/rating/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during deleting, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getRatingDeleteWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid rating Id:0")).when(ratingService).deleteRating(eq(0));
+        mockMvc.perform(get("/rating/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/rating/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid rating Id:0"));
     }
 
 

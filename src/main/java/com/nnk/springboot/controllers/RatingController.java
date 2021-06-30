@@ -89,11 +89,11 @@ public class RatingController {
             LOGGER.info("Delete of rating id " + id + " successful");
             attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting rating " + e.toString());
+            LOGGER.error("Error during deleting rating " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
             LOGGER.error("Error during deleting rating " + e.toString());
-            attributes.addFlashAttribute("message", "Issue during updating, please retry later");
+            attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
         }
         return "redirect:/rating/list";
     }

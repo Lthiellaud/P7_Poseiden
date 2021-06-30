@@ -19,7 +19,7 @@ public class RatingServiceImpl implements RatingService {
      * @param rating the Rating to be created
      */
     @Override
-    public void createRating(Rating rating) {
+    public void createRating(Rating rating) throws Exception {
         ratingRepository.save(rating);
     }
 
@@ -29,7 +29,7 @@ public class RatingServiceImpl implements RatingService {
      * @param id id of the rating to be updated
      */
     @Override
-    public void updateRating(Rating rating, Integer id) {
+    public void updateRating(Rating rating, Integer id) throws Exception {
         Rating updatedRating = getRatingById(id);
         updatedRating.setMoodysRating(rating.getMoodysRating());
         updatedRating.setSandPRating(rating.getSandPRating());
@@ -63,7 +63,7 @@ public class RatingServiceImpl implements RatingService {
      * @param id the id
      */
     @Override
-    public void deleteRating(Integer id) throws IllegalArgumentException {
+    public void deleteRating(Integer id) throws Exception {
         ratingRepository.delete(getRatingById(id));
     }
 }

@@ -37,7 +37,7 @@ class RatingServiceTest {
     }
 
     @Test
-    void createRatingTest() {
+    void createRatingTest() throws Exception {
         when(ratingRepository.save(any(Rating.class))).thenReturn(rating);
         ratingService.createRating(rating);
 
@@ -45,7 +45,7 @@ class RatingServiceTest {
     }
 
     @Test
-    void updateRatingTest() {
+    void updateRatingTest() throws Exception {
         when(ratingRepository.findById(1)).thenReturn(Optional.of(rating));
         when(ratingRepository.save(any(Rating.class))).thenReturn(rating);
         ratingService.updateRating(rating, 1);
@@ -76,7 +76,7 @@ class RatingServiceTest {
     }
 
     @Test
-    void deleteRatingNotFoundedTest() {
+    void deleteRatingNotFoundedTest() throws Exception {
         when(ratingRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()

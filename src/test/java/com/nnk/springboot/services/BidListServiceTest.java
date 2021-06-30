@@ -36,15 +36,16 @@ class BidListServiceTest {
     }
 
     @Test
-    void createBidListTest() {
+    void createBidListTest() throws Exception {
         when(bidListRepository.save(any(BidList.class))).thenReturn(bidList);
+
         bidListService.createBidList(bidList);
 
         verify(bidListRepository, times(1)).save(any(BidList.class));
     }
 
     @Test
-    void updateBidListTest() {
+    void updateBidListTest() throws Exception {
         when(bidListRepository.findById(1)).thenReturn(Optional.of(bidList));
         when(bidListRepository.save(any(BidList.class))).thenReturn(bidList);
         bidListService.updateBidList(bidList, 1);
@@ -75,7 +76,7 @@ class BidListServiceTest {
     }
 
     @Test
-    void deleteBidListNotFoundedTest() {
+    void deleteBidListNotFoundedTest() throws Exception {
         when(bidListRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()

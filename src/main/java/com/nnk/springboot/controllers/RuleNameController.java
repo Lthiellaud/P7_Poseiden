@@ -74,10 +74,10 @@ public class RuleNameController {
             LOGGER.info("Rule name id " + id + "updated");
             attributes.addFlashAttribute("message", "Update successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting rule name " + e.toString());
+            LOGGER.error("Error during updating rule name " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during getting rule name " + e.toString());
+            LOGGER.error("Error during updating rule name " + e.toString());
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
         }
         return "redirect:/ruleName/list";
@@ -90,11 +90,11 @@ public class RuleNameController {
             LOGGER.info("Rule name id " + id + "deleted");
             attributes.addFlashAttribute("message", "Delete successful");
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Error during getting rule name " + e.toString());
+            LOGGER.error("Error during deleting rule name " + e.toString());
             attributes.addFlashAttribute("message", e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during getting rule name " + e.toString());
-            attributes.addFlashAttribute("message", "Issue during updating, please retry later");
+            LOGGER.error("Error during deleting rule name " + e.toString());
+            attributes.addFlashAttribute("message", "Issue during deleting, please retry later");
         }
         return "redirect:/ruleName/list";
     }

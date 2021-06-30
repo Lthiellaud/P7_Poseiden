@@ -36,7 +36,7 @@ class CurvePointServiceTest {
     }
 
     @Test
-    void createCurvePointTest() {
+    void createCurvePointTest() throws Exception {
         when(curvePointRepository.save(any(CurvePoint.class))).thenReturn(curvePoint);
         curvePointService.createCurvePoint(curvePoint);
 
@@ -44,7 +44,7 @@ class CurvePointServiceTest {
     }
 
     @Test
-    void updateCurvePointTest() {
+    void updateCurvePointTest() throws Exception {
         when(curvePointRepository.findById(1)).thenReturn(Optional.of(curvePoint));
         when(curvePointRepository.save(any(CurvePoint.class))).thenReturn(curvePoint);
         curvePointService.updateCurvePoint(curvePoint, 1);
@@ -75,7 +75,7 @@ class CurvePointServiceTest {
     }
 
     @Test
-    void deleteCurvePointNotFoundedTest() {
+    void deleteCurvePointNotFoundedTest() throws Exception {
         when(curvePointRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()

@@ -20,7 +20,7 @@ public class CurvePointServiceImpl implements CurvePointService {
      * @param curvePoint the CurvePoint to be created
      */
     @Override
-    public void createCurvePoint(CurvePoint curvePoint) {
+    public void createCurvePoint(CurvePoint curvePoint) throws Exception {
         curvePoint.setCreationDate(new Timestamp(System.currentTimeMillis()));
         curvePointRepository.save(curvePoint);
     }
@@ -31,7 +31,7 @@ public class CurvePointServiceImpl implements CurvePointService {
      * @param id id of the curvePoint to be updated
      */
     @Override
-    public void updateCurvePoint(CurvePoint curvePoint, Integer id) {
+    public void updateCurvePoint(CurvePoint curvePoint, Integer id) throws Exception {
         CurvePoint updatedCurvePoint = getCurvePointById(id);
         updatedCurvePoint.setCurveId(curvePoint.getCurveId());
         updatedCurvePoint.setTerm(curvePoint.getTerm());
@@ -64,7 +64,7 @@ public class CurvePointServiceImpl implements CurvePointService {
      * @param id the id
      */
     @Override
-    public void deleteCurvePoint(Integer id) throws IllegalArgumentException {
+    public void deleteCurvePoint(Integer id) throws Exception {
         curvePointRepository.delete(getCurvePointById(id));
     }
 }

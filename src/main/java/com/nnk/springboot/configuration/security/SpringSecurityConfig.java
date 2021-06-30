@@ -35,11 +35,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
 
                 //Pages access configuration
-                .antMatchers("/user/**").hasAuthority("ADMIN")
+                .antMatchers("/", "/login", "/logout", "/403", "/app/login", "/app/error").permitAll()
+                .antMatchers("/user/**", "/app/secure/article-details").hasAuthority("ADMIN")
                 .antMatchers("/bidList/**", "/curvePoint/**", "/rating/**", "/ruleName/**"
                         , "/trade/**").hasAnyAuthority("ADMIN", "USER")
-                .antMatchers("/", "/login", "/logout", "/403"
-                        , "/register", "/PMBFondGris.PNG", "/PMBFondBlanc.PNG").permitAll()
                 .anyRequest().authenticated()
                 .and()
 

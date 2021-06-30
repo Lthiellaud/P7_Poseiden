@@ -5,7 +5,9 @@ import com.nnk.springboot.repositories.BidListRepository;
 import com.nnk.springboot.services.BidListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class BidListServiceImpl implements BidListService {
      * @param bidList the BidList to be created
      */
     @Override
-    public void createBidList(BidList bidList) {
+    public void createBidList(BidList bidList) throws Exception {
         bidList.setCreationDate(new Timestamp(System.currentTimeMillis()));
         bidListRepository.save(bidList);
     }
@@ -31,7 +33,7 @@ public class BidListServiceImpl implements BidListService {
      * @param id id of the bidlist to be updated
      */
     @Override
-    public void updateBidList(BidList bidList, Integer id) {
+    public void updateBidList(BidList bidList, Integer id) throws Exception {
         BidList updatedBidList = getBidListById(id);
         updatedBidList.setAccount(bidList.getAccount());
         updatedBidList.setBidQuantity(bidList.getBidQuantity());
@@ -65,7 +67,7 @@ public class BidListServiceImpl implements BidListService {
      * @param id the id
      */
     @Override
-    public void deleteBidList(Integer id) throws IllegalArgumentException {
+    public void deleteBidList(Integer id) throws Exception {
         bidListRepository.delete(getBidListById(id));
     }
 }

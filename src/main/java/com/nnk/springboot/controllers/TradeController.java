@@ -77,10 +77,10 @@ public class TradeController {
             LOGGER.info("Trade id " + id + " updated");
         } catch (IllegalArgumentException e) {
             attributes.addFlashAttribute("message", e.getMessage());
-            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+            LOGGER.error("Error during updating trade id " + id + " " + e.toString());
         } catch (Exception e) {
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
-            LOGGER.error("Error during deleting BindList id " + id + " " + e.toString());
+            LOGGER.error("Error during updating trade id " + id + " " + e.toString());
         }
         return "redirect:/trade/list";
     }

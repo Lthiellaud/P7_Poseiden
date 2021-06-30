@@ -10,11 +10,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -201,12 +205,82 @@ class RuleNameControllerTest {
         mockMvc.perform(post("/ruleName/update/0")
                     .param("name", "")
                     .param("description", "Rule description")
-                    .param("value", "10")
+                    .param("json", "json")
                     .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("ruleName/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("ruleName", "name", "NotBlank"));
     }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRuleNameValidateWithException() throws Exception {
+        doThrow(new SQLException()).when(ruleNameService).createRuleName(any(RuleName.class));
+        mockMvc.perform(post("/ruleName/validate")
+                .param("name", "rule name")
+                .param("description", "Rule description")
+                .param("json", "json")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("ruleName/add"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Issue during creating rule name, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRuleNameUpdateWithException() throws Exception {
+        doThrow(new Exception()).when(ruleNameService).updateRuleName(any(RuleName.class), eq(0));
+        mockMvc.perform(post("/ruleName/update/0")
+                .param("name", "rule name")
+                .param("description", "Rule description")
+                .param("json", "json")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/ruleName/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during updating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postRuleNameUpdateWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid rule name Id:0")).when(ruleNameService).updateRuleName(any(RuleName.class), eq(0));
+        mockMvc.perform(post("/ruleName/update/0")
+                .param("name", "rule name")
+                .param("description", "Rule description")
+                .param("json", "json")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/ruleName/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid rule name Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getRuleNameDeleteWithException() throws Exception {
+        doThrow(new Exception()).when(ruleNameService).deleteRuleName(eq(0));
+        mockMvc.perform(get("/ruleName/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/ruleName/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during deleting, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getRuleNameDeleteWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid rule name Id:0")).when(ruleNameService).deleteRuleName(eq(0));
+        mockMvc.perform(get("/ruleName/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/ruleName/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid rule name Id:0"));
+    }
+
 
 }

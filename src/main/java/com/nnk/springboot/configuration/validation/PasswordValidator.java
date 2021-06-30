@@ -10,7 +10,7 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
     /*
      * at least 1 uppercase letter, 1 number, 1 special character, 8 characters
      */
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{8,}$";
+    private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*#?&./])[A-Za-z0-9@$!%*#?&./]{8,}$";
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REGEX);
 

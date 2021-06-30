@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
      * @param user the User to be created
      */
     @Override
-    public void createUser(User user) throws UserAlreadyExistException {
+    public void createUser(User user) throws Exception {
         if (getUserByUsername(user.getUsername()).isPresent()) {
             LOGGER.error("username already exists");
             throw new UserAlreadyExistException("This username already exists, please, choose an other one");
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
      * @param id id of the user to be updated
      */
     @Override
-    public void updateUser(User user, Integer id) {
+    public void updateUser(User user, Integer id) throws Exception {
         user.setId(id);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
      * @param id the id
      */
     @Override
-    public void deleteUser(Integer id) throws IllegalArgumentException {
+    public void deleteUser(Integer id) throws Exception {
         LOGGER.debug("User delete");
         userRepository.delete(getUserById(id));
     }

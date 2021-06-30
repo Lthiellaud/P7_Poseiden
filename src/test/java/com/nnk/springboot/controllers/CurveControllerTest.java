@@ -10,11 +10,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -213,6 +217,75 @@ class CurveControllerTest {
                 .andExpect(view().name("curvePoint/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("curvePoint", "curveId", "NotNull"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postCurvePointValidateWithException() throws Exception {
+        doThrow(new SQLException()).when(curvePointService).createCurvePoint(any(CurvePoint.class));
+        mockMvc.perform(post("/curvePoint/validate")
+                .param("curveId", "12")
+                .param("term", "10")
+                .param("value", "10")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("curvePoint/add"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Issue during creating curve point, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postCurvePointUpdateWithException() throws Exception {
+        doThrow(new Exception()).when(curvePointService).updateCurvePoint(any(CurvePoint.class), eq(0));
+        mockMvc.perform(post("/curvePoint/update/0")
+                .param("curveId", "12")
+                .param("term", "10")
+                .param("value", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/curvePoint/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during updating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postCurvePointUpdateWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid curve point Id:0")).when(curvePointService).updateCurvePoint(any(CurvePoint.class), eq(0));
+        mockMvc.perform(post("/curvePoint/update/0")
+                .param("curveId", "12")
+                .param("term", "10")
+                .param("value", "10")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/curvePoint/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid curve point Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getCurvePointDeleteWithException() throws Exception {
+        doThrow(new Exception()).when(curvePointService).deleteCurvePoint(eq(0));
+        mockMvc.perform(get("/curvePoint/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/curvePoint/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during deleting, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getCurvePointDeleteWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid curve point Id:0")).when(curvePointService).deleteCurvePoint(eq(0));
+        mockMvc.perform(get("/curvePoint/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/curvePoint/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid curve point Id:0"));
     }
 
 }

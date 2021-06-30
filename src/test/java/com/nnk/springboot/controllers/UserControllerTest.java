@@ -1,10 +1,8 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
-import com.nnk.springboot.configuration.exception.UserAlreadyExistException;
 import com.nnk.springboot.services.UserService;
 import com.nnk.springboot.services.implementation.UserDetailsServiceImpl;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,12 +10,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -312,6 +312,78 @@ class UserControllerTest {
                 .andExpect(view().name("user/update"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeHasFieldErrorCode("user", "password", "ValidPassword"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserValidateWithException() throws Exception {
+        doThrow(new SQLException()).when(userService).createUser(any(User.class));
+        mockMvc.perform(post("/user/validate")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test5")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/add"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("message", "Issue during creating user, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserUpdateWithException() throws Exception {
+        doThrow(new Exception()).when(userService).updateUser(any(User.class), eq(0));
+        mockMvc.perform(post("/user/update/0")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test5")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during updating, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void postUserUpdateWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid user Id:0")).when(userService).updateUser(any(User.class), eq(0));
+        mockMvc.perform(post("/user/update/0")
+                .param("username", "usertest")
+                .param("fullname", "User Test")
+                .param("role", "ADMIN")
+                .param("password", "User@test5")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid user Id:0"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getUserDeleteWithException() throws Exception {
+        doThrow(new Exception()).when(userService).deleteUser(eq(0));
+        mockMvc.perform(get("/user/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Issue during deleting, please retry later"));
+    }
+
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Test
+    public void getUserDeleteWithIllegalArgumentException() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid user Id:0")).when(userService).deleteUser(eq(0));
+        mockMvc.perform(get("/user/delete/0")
+                .with(csrf()))
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(flash().attribute("message", "Invalid user Id:0"));
     }
 
 

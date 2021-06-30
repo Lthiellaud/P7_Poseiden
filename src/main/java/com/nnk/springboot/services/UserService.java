@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    void createUser(User user) throws UserAlreadyExistException;
-    void updateUser(User user, Integer id);
+    void createUser(User user) throws Exception;
+    void updateUser(User user, Integer id) throws Exception;
     List<User> getAllUser();
     User getUserById(Integer id);
-    void deleteUser(Integer id);
+    void deleteUser(Integer id) throws Exception;
     Optional<User> getUserByUsername(String username);
 }

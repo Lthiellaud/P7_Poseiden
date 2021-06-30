@@ -38,7 +38,7 @@ class UserServiceTest {
     }
 
     @Test
-    void createUserTest() throws UserAlreadyExistException {
+    void createUserTest() throws Exception {
         when(userRepository.save(any(User.class))).thenReturn(user);
         userService.createUser(user);
 
@@ -46,14 +46,14 @@ class UserServiceTest {
     }
 
     @Test
-    void tryToCreateAlreadyExistUserTest() {
+    void tryToCreateAlreadyExistUserTest() throws Exception {
         when(userRepository.findUserByUsername("user")).thenReturn(Optional.of(user));
         assertThrows(UserAlreadyExistException.class, () -> userService.createUser(user));
         verify(userRepository, times(0)).save(any(User.class));
     }
 
     @Test
-    void updateUserTest() {
+    void updateUserTest() throws Exception {
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
         userService.updateUser(user, 1);
@@ -84,7 +84,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserNotFoundedTest() {
+    void deleteUserNotFoundedTest() throws Exception {
         when(userRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()

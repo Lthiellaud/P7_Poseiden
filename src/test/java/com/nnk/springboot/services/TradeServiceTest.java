@@ -36,7 +36,7 @@ class TradeServiceTest {
     }
 
     @Test
-    void createTradeTest() {
+    void createTradeTest() throws Exception {
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
         tradeService.createTrade(trade);
 
@@ -44,7 +44,7 @@ class TradeServiceTest {
     }
 
     @Test
-    void updateTradeTest() {
+    void updateTradeTest() throws Exception {
         when(tradeRepository.findById(1)).thenReturn(Optional.of(trade));
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
         tradeService.updateTrade(trade, 1);
@@ -75,7 +75,7 @@ class TradeServiceTest {
     }
 
     @Test
-    void deleteTradeNotFoundedTest() {
+    void deleteTradeNotFoundedTest() throws Exception {
         when(tradeRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()

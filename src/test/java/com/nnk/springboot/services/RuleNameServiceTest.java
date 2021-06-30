@@ -35,7 +35,7 @@ class RuleNameServiceTest {
     }
 
     @Test
-    void createRuleNameTest() {
+    void createRuleNameTest() throws Exception {
         when(ruleNameRepository.save(any(RuleName.class))).thenReturn(ruleName);
         ruleNameService.createRuleName(ruleName);
 
@@ -43,7 +43,7 @@ class RuleNameServiceTest {
     }
 
     @Test
-    void updateRuleNameTest() {
+    void updateRuleNameTest() throws Exception {
         when(ruleNameRepository.findById(1)).thenReturn(Optional.of(ruleName));
         when(ruleNameRepository.save(any(RuleName.class))).thenReturn(ruleName);
         ruleNameService.updateRuleName(ruleName, 1);
@@ -61,7 +61,7 @@ class RuleNameServiceTest {
     }
 
     @Test
-    void getRuleNameByIdNotFoundedTest() {
+    void getRuleNameByIdNotFoundedTest() throws Exception {
         when(ruleNameRepository.findById(1)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(IllegalArgumentException.class, ()
