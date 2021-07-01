@@ -366,17 +366,24 @@ class UserControllerTest {
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     @Test
     public void postUserUpdateWithUserAlreadyExistException() throws Exception {
-        doThrow(new UserAlreadyExistException("This username already exists, please, choose an other one")).when(userService).updateUser(any(User.class), eq(0));
-        mockMvc.perform(post("/user/update/0")
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user");
+        user.setPassword("password");
+        user.setFullname("User Test");
+        user.setRole("USER");
+        doThrow(new UserAlreadyExistException("You can't change the username to usertest, it already exists")).when(userService).updateUser(any(User.class), eq(1));
+        when(userService.getUserById(1)).thenReturn(user);
+        mockMvc.perform(post("/user/update/1")
                 .param("username", "usertest")
                 .param("fullname", "User Test")
                 .param("role", "ADMIN")
                 .param("password", "User@test5")
                 .with(csrf()))
-                .andExpect(status().is(302))
-                .andExpect(view().name("redirect:/user/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/update"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(flash().attribute("message", "This username already exists, please, choose an other one"));
+                .andExpect(model().attribute("message", "You can't change the username to usertest, it already exists"));
     }
 
     @WithMockUser(username = "admin", authorities = {"ADMIN"})

@@ -101,11 +101,12 @@ public class UserController {
      * @param user Updated data for the user
      * @param result the eventual errors in the form
      * @param attributes Message to be displayed on redirect page
+     * @param model model to display User already exist message
      * @return user list if success, update form with errors otherwise
      */
     @PostMapping("/user/update/{id}")
     public String updateUser(@PathVariable("id") Integer id, @ModelAttribute("user") @Valid User user,
-                             BindingResult result, RedirectAttributes attributes) {
+                             BindingResult result, RedirectAttributes attributes, Model model) {
         if (result.hasErrors()) {
             LOGGER.debug("Error in user update form");
             user.setId(id);
@@ -116,18 +117,22 @@ public class UserController {
             userService.updateUser(user, id);
             attributes.addFlashAttribute("message", "Update successful");
             LOGGER.info("User id " + id + " updated");
+            return "redirect:/user/list";
         } catch (IllegalArgumentException e) {
             attributes.addFlashAttribute("message", e.getMessage());
             LOGGER.error("Error during updating user id " + id + " " + e.toString());
+            return "redirect:/user/list";
         } catch (UserAlreadyExistException e) {
             LOGGER.error("Error during updating User " + e.getMessage());
-            attributes.addFlashAttribute("message", e.getMessage());
+            model.addAttribute("user", userService.getUserById(id));
+            model.addAttribute("message", e.getMessage());
+            return "user/update";
         } catch (Exception e) {
             attributes.addFlashAttribute("message", "Issue during updating, please retry later");
             LOGGER.error("Error during updating user id " + id + " " + e.toString());
+            return "redirect:/user/list";
         }
-        LOGGER.debug("user update form Ok");
-        return "redirect:/user/list";
+
     }
 
     /**
