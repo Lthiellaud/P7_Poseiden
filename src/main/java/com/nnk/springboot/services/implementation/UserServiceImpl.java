@@ -45,7 +45,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUser(User user, Integer id) throws Exception {
-        if (getUserByUsername(user.getUsername()).isPresent()) {
+
+        if (getUserByUsername(user.getUsername()).isPresent() && !getUserByUsername(user.getUsername()).get().getId().equals(id) ) {
+
             LOGGER.error("username already exists");
             throw new UserAlreadyExistException("You can't change the username to "
                     + user.getUsername() + ", it already exists");
